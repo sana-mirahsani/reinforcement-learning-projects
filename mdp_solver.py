@@ -1,6 +1,7 @@
-# =============================================================================
-# This file creates a MDP problem and stochastic/deterministic policy and a trajectory
-# =============================================================================
+# ====================================================================
+# This file creates a MDP problem and stochastic/deterministic policy 
+# and a trajectory
+# ====================================================================
 
 # S  = number of states, from 0 to N-1
 # A  = number of actions, from 0 to M-1 

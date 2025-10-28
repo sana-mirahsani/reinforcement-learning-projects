@@ -1,12 +1,13 @@
-# ========================================================================================================
-# This file evaluates a policy by three methods : 1.Linear Algebra 2.Bellman Iteration 3.Monte Carlo Value
-# ========================================================================================================
+# ==========================================================
+# This file evaluates a policy by three methods : 
+# 1.Linear Algebra 2.Bellman Iteration 3.Monte Carlo Value
+# ==========================================================
 
 # =============================================================================
 # 0. Libraries
 # =============================================================================
 import numpy as np
-from mdp_solver import MDP_class, policy_class, trajectory, read_mdp_file, normalize_transition_matrix
+from mdp_solver import MDP_class, policy_class, trajectory, read_mdp_file
 
 # =============================================================================
 # 1. Evaluations functions (all three)
