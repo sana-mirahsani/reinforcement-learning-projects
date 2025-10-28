@@ -82,7 +82,8 @@ class policy_class:
                 Number of states
             M : int
                 Number of actions
-            policy_type : str (deterministic or stochastic)
+            policy_type : str 
+                            (deterministic or stochastic)
         Returns:
             Policy object
         """
@@ -218,6 +219,15 @@ def normalize_transition_matrix(P, tol=1e-8):
 # 5. Main Function (for testing)
 # =============================================================================
 def main_mdp_solver():
+    """
+    Start the process of calculating a MDP, a policy, a trajctory and a G value.
+    
+    Args:
+        None
+    
+    Returns:
+        None
+    """
 
     # Get the inputs
     file_path         = str(input("Enter the path of data file :"))
@@ -230,7 +240,7 @@ def main_mdp_solver():
 
     # Create a MDP object
     mdp_obj = MDP_class(P=transition_f, R=return_f, gamma=discount_factor , N=number_of_states, M=number_of_actions)
-
+    
     # Create a Policy object
     type_of_policy = str(input('Write d for deterministic or s for stochastic : '))
     policy_obj = policy_class(N=number_of_states, M=number_of_actions,policy_type=type_of_policy)
