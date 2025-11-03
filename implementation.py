@@ -8,8 +8,8 @@
 # =============================================================================
 import numpy as np
 import itertools
-from mdp_solver import MDP_class, policy_class, trajectory, read_mdp_file
-from policy_evaluation import linear_algebra
+from mdp_solver import MDP_class, policy_class, read_mdp_file
+from policy_evaluation import linear_algebra, bellman_iteration
 import matplotlib.pyplot as plt
 
 # =============================================================================
@@ -25,14 +25,12 @@ def taxi_driver_impl():
         all_policies_with_V_values (dict): 
             A dictionary mapping each policy (as a tuple) to its V-function.
     """
-    # Get the inputs
-    file_path         = "data.txt" # in the same directory
-    number_of_states  = 3
+    number_of_states = 3
     number_of_actions = 3
     discount_factor   = 0.9
 
     # Extract P and R from data file
-    transition_f, return_f = read_mdp_file(path=file_path, N=number_of_states, M=number_of_actions)
+    transition_f, return_f = read_mdp_file(path="data.txt", N=number_of_states, M=number_of_actions)
 
     # Create a MDP object for taxi driver
     mdp_obj = MDP_class(P=transition_f, R=return_f, gamma=discount_factor, N=number_of_states, M=number_of_actions)
@@ -88,4 +86,102 @@ def taxi_driver_impl():
     plt.grid(axis='y', linestyle='--', alpha=0.7)
     plt.show()
 
-taxi_driver_impl()
+# =============================================================================
+# 2. Create 21 with a die
+# =============================================================================
+def create_21_mdp():
+    """
+    Create the 21-with-one-dice MDP.
+
+    States:
+        0-20: current score
+        21: terminal/bust state
+
+    Actions:
+        0: roll
+        1: stop
+
+    Returns:
+        P: Transition probabilities, shape (N, M, N)
+        R: Rewards, shape (N, M, N)
+    """
+    N = 22  # states 0-21
+    M = 2   # actions: 0=roll, 1=stop
+
+    P = np.zeros((N, M, N))
+    R = np.zeros((N, M, N))
+    
+    for s in range(21):  # terminal state 21 has no outgoing transitions
+        # roll 
+        for dice in range(1, 7):  # dice outcomes 1-6
+            s_next = s + dice
+            if s_next > 21:
+                s_next = 21  # bust/terminal
+                reward = 0
+            elif s_next == 21:
+                reward = 1  # win
+            else:
+                reward = 0
+            P[s, 0, s_next] += 1/6
+            R[s, 0, s_next] = reward
+        
+        # stop 
+        s_next = 21  # terminal state
+        P[s, 1, s_next] = 1
+        R[s, 1, s_next] = s / 21  # normalized reward for stopping
+    
+    # Terminal state 21: no transitions
+    P[21, :, 21] = 1
+    R[21, :, 21] = 0
+    
+    return P, R
+
+def twenty_one_with_a_die_impl():
+    """
+    Evaluate a uniformly random policy for 21-with-a-die by both methods.
+
+    Args :
+        None
+    Returns : 
+        all_policies_with_V_values (dict): 
+            A dictionary mapping each policy (as a tuple) to its V-function.
+    """
+    transition_f,return_f = create_21_mdp()
+    # Create a MDP object for 21
+    mdp_obj = MDP_class(P=transition_f, R=return_f, gamma=0.9, N=22, M=2)
+    # Create a Policy object 
+    policy_obj = policy_class(N=22, M=2,policy_type='s')
+    policy_obj.generate_policy() # creates the policy array
+
+    print(f"Policy for 21 problem : {policy_obj.policy_array}")
+
+    # Compute the value for this specific policy
+    v_value = linear_algebra(mdp_obj, policy_obj)
+    print(f"Value of linear algebra : {v_value}")
+
+    v_value = bellman_iteration(mdp_obj, policy_obj, tol=1e-6, max_iter=10000)
+    print(f"Value of bellman iteration : {v_value}")
+
+# =============================================================================
+# 5. Main Function (for testing)
+# =============================================================================
+def main_implementation():
+    """
+    Start the process of Implementing.
+    
+    Args:
+        None
+    
+    Returns:
+        None
+    """
+
+    taxi_driver_impl()
+    twenty_one_with_a_die_impl()
+
+# =============================================================================
+# 6. Main Execution (only when the script is executed directly)
+# =============================================================================
+if __name__ == '__main__':
+    main_implementation()
+
